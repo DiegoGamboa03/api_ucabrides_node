@@ -1,0 +1,27 @@
+{
+  "name": "api_ucabrides_node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DiegoGamboa03/api_ucabrides_node.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DiegoGamboa03/api_ucabrides_node/issues"
+  },
+  "homepage": "https://github.com/DiegoGamboa03/api_ucabrides_node#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
