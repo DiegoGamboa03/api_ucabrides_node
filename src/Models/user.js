@@ -1,9 +1,9 @@
 class User {
-    constructor(id,name, username, distancia, email, password, avatar, external_id, status) {
+    constructor(id,name, username, distance, email, password, avatar, external_id, status) {
       this.id = id;
       this.name = name;
       this.username = username;
-      this.distancia = distancia;
+      this.distance = distance; //Para que esta esto aqui?
       this.email = email;
       this.password = password;
       this.avatar = avatar;
