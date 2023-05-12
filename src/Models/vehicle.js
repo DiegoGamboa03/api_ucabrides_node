@@ -1,7 +1,12 @@
-class Vehicle {
-    constructor(id, created_at, updated_at) {
-      this.id = id;
-      this.created_at = created_at;
-      this.updated_at = updated_at;
-    }
-}  
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+const VehicleSchema = new Schema({
+  user_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }
+});
+
+module.exports = mongoose.model('Vehicle', VehicleSchema);

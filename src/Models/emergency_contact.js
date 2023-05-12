@@ -1,6 +1,13 @@
-class EmergencyContact { //Por que no tiene el numero de tlf?
-    constructor(id, created_at, updated_at) {
-      this.id = id; 
-      this.created_at = created_at;
-      this.updated_at = updated_at;
-    }}
+const mongoose = require('mongoose');
+
+const Emergency_contactSchema = new mongoose.Schema({
+    user_id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }
+}, {
+    collection: 'contacto_sos',
+    timestamps: false
+});
+
+module.exports = mongoose.model('Emergency_contact', Emergency_contactSchema);

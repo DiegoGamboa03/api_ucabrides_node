@@ -1,8 +1,11 @@
-class Route {
-    constructor(id, lat, lng, user_id) {
-      this.id = id;
-      this.lat = lat; //Esto asi no tiene sentido, esto seria un punto
-      this.lng = lng;
-      this.user_id = user_id;
-    }
-}
+const mongoose = require('mongoose');
+
+const RoutesSchema = new mongoose.Schema({
+  lat: { type: String, required: true },
+  lng: { type: String, required: true },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+});
+
+const Routes = mongoose.model('Routes', RoutesSchema);
+
+module.exports = Routes;
