@@ -112,3 +112,53 @@ export const register_gmail = async (req, res) => {
   }
 }
 
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Comprobamos si las credenciales corresponden a un nombre de usuario
+    let user = await User.findOne({ username: email });
+    if (!user) {
+      // Si no existe un usuario con el nombre de usuario, comprobamos si existe uno con el correo electrónico
+      user = await User.findOne({ email: email });
+      if (!user) {
+        // Si no existe un usuario con el correo electrónico o el nombre de usuario proporcionado, respondemos con un error
+        return res.status(401).json({ error: 'Credenciales Incorrectas' });
+      }
+    }
+
+    // Comprobamos que la contraseña es correcta
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Credenciales Incorrectas' });
+    }
+
+    // Generamos un token de autenticación
+    const payload = { user: { id: user.id } };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Enviamos la respuesta al cliente con el token de autenticación
+    return res.status(200).json({
+      message: 'Exito al iniciar sesion',
+      access_token: token,
+      token_type: 'bearer',
+      expires_in: 3600,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+        distancia: user.distancia,
+        direccion: user.direccion,
+        estatus: user.estatus,
+        puntos: user.puntos,
+      },
+    });
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).send('Error del servidor');
+  }
+};
+
+
