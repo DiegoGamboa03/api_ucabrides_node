@@ -6,7 +6,21 @@ const VehicleSchema = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+  },
+  marca: {
+    type: String,
+    required: true
+  },
+  color: {
+    type: String,
+    required: true
+  },
+  placa: {
+    type: String,
+    required: true
   }
 });
 
-module.exports = mongoose.model('Vehicle', VehicleSchema);
+const Vehicle = mongoose.model('Vehicle', VehicleSchema);
+
+export default Vehicle;
