@@ -1,8 +1,9 @@
 import User from '../Schemes/user.js'
 import bcrypt from 'bcrypt';
+import createHttpError from 'http-errors';
 import jwt from 'jsonwebtoken'
 
-
+// Funcion para registrar un usuario
 export const register = async (req, res) => {
   try {
 
@@ -40,6 +41,7 @@ export const register = async (req, res) => {
   }
 };
 
+// Funcion para registrar un usuario con Gmail
 export const register_gmail = async (req, res) => {
   try {
     // Buscamos si ya existe un usuario registrado con este correo
@@ -112,6 +114,7 @@ export const register_gmail = async (req, res) => {
   }
 }
 
+// Funcion para iniciar sesion
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -134,8 +137,8 @@ export const login = async (req, res) => {
     }
 
     // Generamos un token de autenticación
-    const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const payload = { _id: user.id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10h' });
 
     // Enviamos la respuesta al cliente con el token de autenticación
     return res.status(200).json({
@@ -149,10 +152,10 @@ export const login = async (req, res) => {
         email: user.email,
         username: user.username,
         avatar: user.avatar,
-        distancia: user.distancia,
-        direccion: user.direccion,
-        estatus: user.estatus,
-        puntos: user.puntos,
+        distancia: user.distance,
+        direccion: user.address,
+        estatus: user.status,
+        puntos: user.score,
       },
     });
   } catch (err) {
@@ -161,4 +164,88 @@ export const login = async (req, res) => {
   }
 };
 
+// Funcion para refrescar el token de autenticación
+export const refresh = async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  
+  // Verificar si el token es válido y refrescarlo si es necesario
+  jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+    if (err) {
+      return res.status(401).json({ error: 'Token inválido' });
+    }
+    
+    const payload = { email: decoded.email };
+    const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ token: newToken });
+  });
+};
 
+//Funcion para cambiar la clave del usuario
+export const changePassword = async (req, res) => {
+  const { clave } = req.body;
+  const userId = req.params.id;
+
+  try {
+    const hashedPassword = await bcrypt.hash(clave, 10);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { password: hashedPassword } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    return res.status(200).json({ exito: hashedPassword });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// Funcion para obtener el status del usuario
+export const me = async (req, res) => {
+  try {
+
+    // Obtener el token de autorización de la solicitud
+    const token = req.header('Authorization').replace('Bearer ', '');
+    // Verificar el token y obtener la información del usuario
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded)
+    // Buscar al usuario en la base de datos usando el ID decodificado del token
+    const user = await User.findOne({ _id: decoded._id });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const estatus = user.status;
+    return res.json(estatus);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+export const mis_puntos = async (req, res) => {
+  try {
+    // Obtener el token de autorización de la solicitud
+    const token = req.header('Authorization').replace('Bearer ', '');
+    // Verificar el token y obtener la información del usuario
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Buscar al usuario en la base de datos usando el ID decodificado del token
+    const user = await User.findOne({ _id: decoded._id });
+    
+    if (!user) {
+      // Si no se encuentra al usuario, devolver un error
+      return res.status(401).json({ error: 'No se encontró el usuario' });
+    }
+
+    // Devolver los puntos del usuario como respuesta
+    res.json(user.score);
+  } catch (error) {
+    // Si ocurre un error, devolver un error 500
+    console.error(error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
