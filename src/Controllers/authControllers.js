@@ -8,9 +8,9 @@ export const register = async (req, res) => {
   try {
 
     // Validar los campos del formulario
-    const { name, email, password } = req.body;
+    const { name, email, password, phoneNumber } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+      throw createHttpError.BadRequest('Todos los campos son obligatorios');
     }
     
     //Verificar si el correo electrónico ya está registrado
@@ -29,7 +29,9 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       username,
-      distance: 0
+      distance: 0,
+      phoneNumber,
+      status: { cola: false, orden_ruta_id: null }
     });
     await user.save();
 
@@ -63,16 +65,14 @@ export const register_gmail = async (req, res) => {
           external_id: req.body.external_id,
           avatar: req.body.avatar,
           distance: 0,
-          direccion: null,
-          // status: { cola: false, orden_ruta_id: null },
-          status: 1
+          status: { cola: false, orden_ruta_id: null },
         });
 
         // Guardamos el usuario en la base de datos
         const savedUser = await newUser.save();
 
         // Generamos un token de acceso
-        const token = jwt.sign({ user: savedUser }, process.env.JWT_SECRET);
+        const token = jwt.sign({ user: savedUser }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
         // Enviamos la respuesta con el token y los datos del usuario
         res.status(200).json({
@@ -96,7 +96,7 @@ export const register_gmail = async (req, res) => {
       const updatedUser = await existingUser.save();
 
       // Generamos un token de acceso
-      const token = jwt.sign({ user: updatedUser }, process.env.JWT_SECRET);
+      const token = jwt.sign({ user: updatedUser }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
       // Enviamos la respuesta con el token y los datos del usuario
       res.status(200).json({
@@ -137,8 +137,7 @@ export const login = async (req, res) => {
     }
 
     // Generamos un token de autenticación
-    const payload = { _id: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10h' });
+    const token = jwt.sign({user}, process.env.JWT_SECRET, { expiresIn: '30d' });
 
     // Enviamos la respuesta al cliente con el token de autenticación
     return res.status(200).json({

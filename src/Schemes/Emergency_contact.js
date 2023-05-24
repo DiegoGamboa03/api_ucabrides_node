@@ -8,4 +8,4 @@ const Emergency_contactSchema = new Schema({
   user_id: { type: Schema.Types.ObjectId, required: true }
 });
 
-module.exports =  mongoose.model('Emergency_contact', Emergency_contactSchema);
+export default mongoose.model('Emergency_contact', Emergency_contactSchema);

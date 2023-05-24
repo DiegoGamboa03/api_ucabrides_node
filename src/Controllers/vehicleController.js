@@ -4,7 +4,7 @@ import Vehicle from '../Schemes/Vehicle.js';
 export const index = async (req, res) =>  {
   try {
     // Buscar los vehículos por el ID del usuario autenticado
-    const vehicles = await Vehicle.find({ user_id: req.payload._id });
+    const vehicles = await Vehicle.find({ user_id: req.payload.user._id });
 
     return res.status(200).json(vehicles);
   } catch (error) {
@@ -15,15 +15,12 @@ export const index = async (req, res) =>  {
 
 export const createVehicle = async (req, res) => {
     try {
-      // acceder al payload del request 
-      console.log(req.payload)
-
       // Crear un nuevo vehículo con los datos del cuerpo de la solicitud
       const vehicle = new Vehicle({
         marca: req.body.marca,
         color: req.body.color,
         placa: req.body.placa,
-        user_id: req.payload._id
+        user_id: req.payload.user._id
       });
   
       // Guardar el vehículo en la base de datos

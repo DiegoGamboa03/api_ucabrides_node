@@ -1,9 +1,7 @@
 import mongoose from 'mongoose';
 
-const DB_URI = 'mongodb://127.0.0.1:27017/ucabrides_node';
-
 const connect = () => {
-  mongoose.connect(DB_URI, {
+  mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
