@@ -11,9 +11,13 @@ import phoneRoutes from './Routes/phoneRoutes.js'
 import emergencyContactRoutes from './Routes/emergencyContactRoutes.js'
 import connect from '../config/mongoConnection.js';
 import { routeNotFound, errorHandler } from './helpers/error.js';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
 const PORT = process.env.PORT || 8080
+const server = createServer(app);
+const io = new Server(server);
 
 //middlewares
 app.use(cors())
@@ -33,10 +37,24 @@ app.use('/api', emergencyContactRoutes)
 app.use(routeNotFound)
 app.use(errorHandler)
 
+//Sockets
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+  
+    // Handle socket events
+    // For example: socket.on('event', () => { ... });
+  
+    socket.on('disconnect', () => {
+      console.log('Client disconnected');
+    });
+  });
+
 //starting the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
 });
 
 //Connect to the database
 connect()
+

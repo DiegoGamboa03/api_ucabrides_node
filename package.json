@@ -29,7 +29,8 @@
     "mongodb": "4.1",
     "mongoose": "^7.1.1",
     "morgan": "^1.10.0",
-    "polyline-encoded": "^0.0.9"
+    "polyline-encoded": "^0.0.9",
+    "socket.io": "^4.6.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
