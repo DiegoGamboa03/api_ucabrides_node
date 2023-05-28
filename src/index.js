@@ -13,6 +13,7 @@ import connect from '../config/mongoConnection.js';
 import { routeNotFound, errorHandler } from './helpers/error.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { handleSocketEvents } from './Helpers/socketEvents.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080
@@ -38,14 +39,17 @@ app.use(routeNotFound)
 app.use(errorHandler)
 
 //Sockets
+let connectedClients = [] //Aqui almacenamos todos los clientes que estan actualmente conectados a la api
 
 io.on('connection', (socket) => {
+
     console.log('New client connected');
   
-    // Handle socket events
-    // For example: socket.on('event', () => { ... });
+    handleSocketEvents(socket,connectedClients);
   
-    socket.on('disconnect', () => {
+    socket.on('disconnect', () => { //Una vez desconectado lo elimino de la lista de clientes conectados
+      const index = connectedClients.findIndex(obj => obj.socketId === socket.id);
+      connectedClients.splice(index, 1);
       console.log('Client disconnected');
     });
   });
